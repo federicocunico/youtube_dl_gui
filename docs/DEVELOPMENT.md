@@ -5,6 +5,22 @@ Requirements: Windows 10/11 x64, Node 22.22.0, Rust 1.93.1 (selected by
 with C++, a Windows SDK, and WebView2. Windows `tar.exe` extracts pinned archives.
 No global Python, FFmpeg or Deno is required.
 
+With GNU Make installed, run `make all` to set up the project environment,
+run deterministic tests, build the production installer, test its installed
+runtime and collect the distributable under `artifacts/`. `make help` lists
+individual targets. The same entry point works without Make:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Task all
+```
+
+`make setup` checks the pinned Node version and Visual C++ compiler, installs
+the pinned Rust toolchain through rustup, runs `npm ci`, provisions the private
+runtime from hashes and installs the Playwright test browser. Install the
+machine prerequisites listed above first; this command does not silently
+replace a system Node installation or install Visual Studio. Stop a running
+development server before setup so `npm ci` can replace its Windows binaries.
+
 From the repository root in PowerShell:
 
 ```powershell

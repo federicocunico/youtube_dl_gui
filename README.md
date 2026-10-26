@@ -10,6 +10,10 @@ Get the precompiled installer from [GitHub Actions](https://github.com/federicoc
 or versioned [releases](https://github.com/federicocunico/youtube_dl_gui/releases).
 See the [installation guide](docs/INSTALLATION.md) and [user guide](docs/USER-GUIDE.md).
 
+For a complete local setup, verification and Windows installer build, run
+`make all`. Run `make help` for individual targets. Without Make, use
+`powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Task all`.
+
 See [development instructions](docs/DEVELOPMENT.md) for a local build and the
 [worker protocol](worker/PROTOCOL.md) for the native/engine boundary. No global
 Python installation is required. Runtime source and licenses are recorded in

@@ -43,7 +43,10 @@ async function mock(page: Page, count = 0) {
         const fn = callbacks[listeners[event]];
         if (fn) fn({ event, id: 1, payload: structuredClone(payload) });
       };
-      w.__send = emit;
+      w.__send = (event: string, payload: any) => {
+        if (event === 'snapshot') state = structuredClone(payload);
+        emit(event, payload);
+      };
       w.__snapshot = () => structuredClone(state);
       if (count)
         setInterval(() => {
