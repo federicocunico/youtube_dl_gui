@@ -286,6 +286,41 @@ test('missing files and update errors remain actionable', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'Controlla e riprova ora' }),
   ).toBeEnabled();
+  for (const [phase, label, message] of [
+    [
+      'inconclusive',
+      'Test da riprovare',
+      'Rete non disponibile. Conservata la versione attiva.',
+    ],
+    [
+      'rollback',
+      'Versione precedente ripristinata',
+      'Ripristinata automaticamente la versione precedente.',
+    ],
+  ]) {
+    await page.evaluate(
+      ({ phase, message }) => {
+        const w = window as any;
+        const state = w.__snapshot();
+        state.update = {
+          phase,
+          message,
+          installed_version: '2026.10.21',
+          last_success: 1793011764,
+        };
+        w.__send('snapshot', state);
+      },
+      { phase, message },
+    );
+    await expect(page.getByText(label, { exact: true })).toBeVisible();
+    await expect(page.getByText(message, { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Ultimo test riuscito', { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Controlla e riprova ora' }),
+    ).toBeEnabled();
+  }
 });
 
 test('unavailable embedded preview offers the browser fallback', async ({
