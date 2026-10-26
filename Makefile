@@ -2,9 +2,9 @@
 SHELL := cmd.exe
 .DEFAULT_GOAL := all
 .NOTPARALLEL:
-.PHONY: all setup check test build package smoke live help
+.PHONY: all setup check test build package smoke live release help
 
-all setup check test build package smoke live:
+all setup check test build package smoke live release:
 	powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Task $@
 
 help:
@@ -16,3 +16,4 @@ help:
 	@echo make package  - build installer and collect checksums/notices
 	@echo make smoke    - test the installed package
 	@echo make live     - real YouTube download and rollback tests
+	@echo make release  - verify the CI installer locally, then automatically push tag and publish

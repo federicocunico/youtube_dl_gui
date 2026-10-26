@@ -49,9 +49,9 @@ smoke uses private tools with an empty PATH and runs the Rust integration tests
 against installed resources. Native WebView2 automation is CI-only.
 
 The Windows workflow runs deterministic gates, builds and installs NSIS, checks
-the production worker and native UI, and uploads verified artifacts. Tag builds
-also enforce matching app versions and successful live download/rollback gates
-before a separate least-privilege release job publishes the installer.
+the production worker and native UI, and uploads verified artifacts. Publication
+also requires successful live download/rollback validation of that exact
+installer before a separate least-privilege job creates the tag and release.
 
 ## Automatic tags and releases
 
@@ -59,18 +59,27 @@ Set the same new SemVer in `package.json`, both root entries in
 `package-lock.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`.
 Regenerate and commit the Cargo lockfile after a version change with
 `cargo check --manifest-path src-tauri/Cargo.toml`.
-Push to `main` (or manually dispatch the workflow on `main`). The workflow
-detects that `v<version>` does not exist, runs the real YouTube and rollback
-gates against the installed package, then pushes an annotated tag and creates
-a GitHub release with the verified installer, checksums, inventory and notices.
-The release remains a draft until all expected assets are uploaded.
+Commit the changes on `main`, sign in with `gh auth login` as the repository
+owner, then run `make release`. The coordinator pushes `main`, monitors its
+Windows workflow, downloads the exact CI installer and checks its hashes. It
+installs that package and runs the real YouTube canaries and induced-regression
+rollback locally. YouTube blocks GitHub-hosted data-center IPs, so these online
+checks use the developer's network; they remain mandatory.
+
+After success, the coordinator sends an authenticated `repository_dispatch`
+request containing the source commit, successful build run ID, installer
+SHA-256, timestamp and full test reports. The publication job accepts requests
+only from the repository owner, verifies the successful main build, exact
+installer, registered canaries, engine version and proof freshness, then pushes
+the annotated version tag. It creates a draft release, uploads all assets and
+publishes it. `LIVE-VALIDATION.json` and its checksum accompany the installer.
 
 No additional token secret is required. Tag creation and release publication
-share the same verified workflow because tags pushed with `GITHUB_TOKEN` do
-not trigger another run. Existing version tags are never moved; ordinary
-commits with an already tagged version produce CI artifacts only. Pushing a
-matching `v*` tag directly also runs all release gates. Re-running a failed
-publication can resume its draft; an existing published release is preserved.
+share the same publication workflow because tags pushed with `GITHUB_TOKEN`
+do not trigger another run. Existing tags are never moved. Ordinary pushes
+produce CI artifacts; publication requires the verified local proof. A failed
+or inconclusive online test stops the coordinator before dispatch. Re-running
+a failed publication can resume its draft; published releases are preserved.
 
 To work on the desktop UI:
 

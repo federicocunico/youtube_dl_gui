@@ -4,6 +4,7 @@ import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { readVersion } from './release-version.mjs';
+import { validateReleaseProof, validateBuildRun } from './release-proof.mjs';
 
 export function verifiedAssets(directory, version) {
   const required = [
@@ -60,22 +61,57 @@ function main() {
   if (process.env.RELEASE_TAG !== tag)
     throw new Error('Unexpected release tag.');
   const head = command('git', ['rev-parse', 'HEAD']).stdout.trim();
-  if (head !== process.env.GITHUB_SHA)
+  if (head !== process.env.VERIFIED_SHA)
     throw new Error(
       'Release checkout does not match the verified build commit.',
     );
+  const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+  if (
+    event.action !== 'yt-saver-release-validated' ||
+    event.sender.login !== event.repository.owner.login ||
+    event.repository.full_name !== process.env.GH_REPO
+  )
+    throw new Error(
+      'Release validation must be submitted by the repository owner.',
+    );
+  const proof = event.client_payload;
+  const installerSha = createHash('sha256')
+    .update(readFileSync(assets[0]))
+    .digest('hex');
+  validateReleaseProof(proof, {
+    version,
+    commit: head,
+    installerSha,
+    engine: JSON.parse(readFileSync('artifacts/runtime-lock.json', 'utf8'))
+      .engine,
+    canaryUrls: JSON.parse(
+      readFileSync('resources/canaries.json', 'utf8'),
+    ).videos.map((item) => item.url),
+  });
+  const build = JSON.parse(
+    command('gh', [
+      'api',
+      `repos/${process.env.GH_REPO}/actions/runs/${proof.run_id}`,
+    ]).stdout,
+  );
+  validateBuildRun(build, { commit: head, repository: process.env.GH_REPO });
+  const validationAsset = resolve('artifacts/LIVE-VALIDATION.json');
+  writeFileSync(validationAsset, JSON.stringify(proof, null, 2) + '\n');
+  assets.push(validationAsset);
+  const proofDigest = createHash('sha256')
+    .update(readFileSync(validationAsset))
+    .digest('hex');
+  const sums = readFileSync('artifacts/SHA256SUMS.txt', 'utf8').trimEnd();
+  writeFileSync(
+    'artifacts/SHA256SUMS.txt',
+    `${sums}\n${proofDigest}  LIVE-VALIDATION.json\n`,
+  );
   const existing = command(
     'git',
     ['rev-parse', '--verify', `refs/tags/${tag}^{commit}`],
     [0, 128],
   );
   if (existing.status === 0 && existing.stdout.trim() !== head) {
-    if (process.env.GITHUB_REF === 'refs/heads/main') {
-      console.log(
-        `${tag} was already created for an earlier commit; no release replaced.`,
-      );
-      return;
-    }
     throw new Error(
       'Existing tag points to another commit; refusing to move it.',
     );

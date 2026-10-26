@@ -10,8 +10,9 @@ Get the precompiled installer from [GitHub Actions](https://github.com/federicoc
 or versioned [releases](https://github.com/federicocunico/youtube_dl_gui/releases).
 See the [installation guide](docs/INSTALLATION.md) and [user guide](docs/USER-GUIDE.md).
 
-New manifest versions on `main` automatically create an annotated version tag
-and a release after all installed-app and live download checks pass.
+`make release` waits for the Windows CI build, downloads its exact installer,
+tests real YouTube downloads and rollback locally, then asks CI to automatically
+push the annotated version tag and publish the verified release.
 
 For a complete local setup, verification and Windows installer build, run
 `make all`. Run `make help` for individual targets. Without Make, use

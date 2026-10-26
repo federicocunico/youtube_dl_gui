@@ -16,6 +16,7 @@ run(process.execPath, [
   '--test',
   'tests/release-gate.test.mjs',
   'tests/release-automation.test.mjs',
+  'tests/release-proof.test.mjs',
 ]);
 run(resolve('resources/runtime/python/python.exe'), [
   '-I',

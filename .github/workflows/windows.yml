@@ -5,16 +5,19 @@ on:
     branches: [main]
     tags: ['v*']
   workflow_dispatch:
+  repository_dispatch:
+    types: [yt-saver-release-validated]
 
 permissions:
   contents: read
 
 concurrency:
-  group: windows-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  group: windows-${{ github.event_name == 'repository_dispatch' && format('release-{0}', github.event.client_payload.version) || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'repository_dispatch' && !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   version:
+    if: github.event_name != 'repository_dispatch'
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.plan.outputs.tag }}
@@ -78,7 +81,7 @@ jobs:
       - name: Installed production package and native UI
         shell: pwsh
         env:
-          FRAME_VERIFY_LIVE: ${{ needs.version.outputs.publish }}
+          FRAME_VERIFY_LIVE: 'false'
         run: |
           $version = (Get-Content package.json | ConvertFrom-Json).version
           $installer = Get-ChildItem "src-tauri/target/release/bundle/nsis/YT Saver_$($version)_x64-setup.exe"
@@ -124,18 +127,23 @@ jobs:
           key: windows-runtime-${{ hashFiles('resources/runtime-lock.json', 'resources/engine-requirements.txt') }}
 
   release:
-    if: needs.version.outputs.publish == 'true'
-    needs: [version, build]
+    if: github.event_name == 'repository_dispatch' && github.event.sender.login == github.repository_owner
     runs-on: ubuntu-latest
     concurrency:
-      group: yt-saver-release-${{ needs.version.outputs.tag }}
+      group: yt-saver-release-${{ github.event.client_payload.version }}
       cancel-in-progress: false
     permissions:
       contents: write
+      actions: read
     steps:
+      - name: Validate authenticated release request
+        env:
+          EXPECTED_OWNER: ${{ github.repository_owner }}
+        run: |
+          node -e 'const e=JSON.parse(require("fs").readFileSync(process.env.GITHUB_EVENT_PATH)); if(e.sender.login!==process.env.EXPECTED_OWNER || e.client_payload.schema!==1 || !/^[a-f0-9]{40}$/.test(e.client_payload.commit) || !/^\d+$/.test(e.client_payload.run_id)) throw Error("Invalid owner-authenticated release request");'
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.client_payload.commit }}
           fetch-depth: 0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
@@ -144,9 +152,12 @@ jobs:
         with:
           name: YT-Saver-windows-x64
           path: artifacts
+          run-id: ${{ github.event.client_payload.run_id }}
+          github-token: ${{ github.token }}
       - name: Publish the verified installer
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ needs.version.outputs.tag }}
+          RELEASE_TAG: v${{ github.event.client_payload.version }}
+          VERIFIED_SHA: ${{ github.event.client_payload.commit }}
         run: node scripts/publish-release.mjs

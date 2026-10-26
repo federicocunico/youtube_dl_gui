@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([ValidateSet('all','setup','check','test','build','package','smoke','live')][string]$Task = 'all')
+param([ValidateSet('all','setup','check','test','build','package','smoke','live','release')][string]$Task = 'all')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 Set-Location (Split-Path -Parent $PSScriptRoot)
@@ -50,6 +50,7 @@ try {
         'package' { Build-Installer; Invoke-Checked 'node.exe' @('scripts/collect-artifacts.mjs') }
         'smoke' { Test-Installed }
         'live' { Invoke-Checked 'npm.cmd' @('run','verify:live') }
+        'release' { Invoke-Checked 'node.exe' @('scripts/release-local.mjs') }
         'all' {
             Setup-Environment
             Invoke-Checked 'npm.cmd' @('run','verify')

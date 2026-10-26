@@ -1,11 +1,15 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, existsSync, unlinkSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { assertLiveReports } from './release-gate.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 mkdirSync(join(root, 'test-results'), { recursive: true });
+for (const name of ['canary-report.json', 'update-rollback-report.json']) {
+  const path = join(root, 'test-results', name);
+  if (existsSync(path)) unlinkSync(path);
+}
 const result = spawnSync(
   'cargo',
   [
