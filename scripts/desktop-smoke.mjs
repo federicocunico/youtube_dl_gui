@@ -1,7 +1,7 @@
 // Native WebView2 rendering on an isolated CI runner. Never opens UI on the user's desktop.
 import { chromium } from '@playwright/test';
-import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import { spawn, spawnSync } from 'node:child_process';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createServer } from 'node:net';
 if (process.env.CI !== 'true')
@@ -18,13 +18,20 @@ const child = spawn(join(root, 'Frame.exe'), [], {
   env: {
     ...process.env,
     PATH: '',
-    WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${port} --remote-debugging-address=127.0.0.1`,
+    WEBVIEW2_USER_DATA_FOLDER: join(reports, 'webview-profile'),
+    WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${port} --disable-gpu`,
   },
-  stdio: 'ignore',
+  stdio: ['ignore', 'pipe', 'pipe'],
 });
+let output = '';
+for (const stream of [child.stdout, child.stderr])
+  stream.on('data', (data) => {
+    output = (output + data).slice(-65536);
+  });
+let lastConnectionError;
 let browser;
 try {
-  for (let attempt = 0; attempt < 120; attempt++) {
+  for (let attempt = 0; attempt < 240; attempt++) {
     if (child.exitCode !== null)
       throw new Error(`Native application exited: ${child.exitCode}`);
     try {
@@ -32,14 +39,37 @@ try {
         timeout: 1000,
       });
       break;
-    } catch {
+    } catch (error) {
+      lastConnectionError = String(error);
       await new Promise((r) => setTimeout(r, 250));
     }
   }
-  if (!browser)
-    throw new Error(
-      'Native WebView2 did not expose its CI debugging endpoint.',
+  if (!browser) {
+    writeFileSync(
+      join(reports, 'startup.log'),
+      output + '\n' + lastConnectionError,
     );
+    const diagnostic = spawnSync(
+      join(
+        process.env.SystemRoot,
+        'System32/WindowsPowerShell/v1.0/powershell.exe',
+      ),
+      [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        `Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^(Frame|msedgewebview2)' } | Select-Object Name,ProcessId,CommandLine | ConvertTo-Json -Depth 3; Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $bounds=[Windows.Forms.Screen]::PrimaryScreen.Bounds; $bitmap=[Drawing.Bitmap]::new($bounds.Width,$bounds.Height); $graphics=[Drawing.Graphics]::FromImage($bitmap); $graphics.CopyFromScreen($bounds.Location,[Drawing.Point]::Empty,$bounds.Size); $bitmap.Save('test-results/native/startup-desktop.png'); $graphics.Dispose(); $bitmap.Dispose()`,
+      ],
+      { encoding: 'utf8', windowsHide: true, timeout: 15000 },
+    );
+    writeFileSync(
+      join(reports, 'processes.log'),
+      diagnostic.stdout + diagnostic.stderr,
+    );
+    throw new Error(
+      `Native WebView2 did not expose its CI debugging endpoint: ${lastConnectionError}`,
+    );
+  }
   let page;
   for (let attempt = 0; attempt < 80; attempt++) {
     page = browser
