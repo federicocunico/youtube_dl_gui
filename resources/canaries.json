@@ -1,0 +1,21 @@
+{
+    "schema":  1,
+    "byte_limit":  26214400,
+    "timeout_seconds":  120,
+    "videos":  [
+                   {
+                       "url":  "https://www.youtube.com/watch?v=el3E4MbxRqQ",
+                       "expected_duration_seconds":  5,
+                       "source":  "yt-dlp YoutubeIE._TESTS",
+                       "purpose":  "Upstream dlp test video 2, short public extraction fixture"
+                   },
+                   {
+                       "url":  "https://www.youtube.com/watch?v=gHKT4uU8Zng",
+                       "expected_duration_seconds":  5,
+                       "source":  "yt-dlp YoutubeIE._TESTS",
+                       "purpose":  "Upstream dlp test video title primary, short public extraction fixture"
+                   }
+               ],
+    "provenance":  "https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/extractor/youtube/_video.py",
+    "verification":  "Both public fixtures passed real separate-stream video/audio mux and audio-only validation on 2026-10-26; selected video 243 (VP9 360p) and audio 251 (Opus), duration 5.021 s."
+}

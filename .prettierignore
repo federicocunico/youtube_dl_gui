@@ -1,0 +1,11 @@
+node_modules/
+dist/
+resources/runtime/
+.runtime-cache/
+src-tauri/target/
+test-results/
+playwright-report/
+.agents/
+.claude/
+.cursor/
+openspec/

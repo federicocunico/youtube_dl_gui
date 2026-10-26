@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Frame",
+  "mainBinaryName": "Frame",
+  "version": "0.1.0",
+  "identifier": "io.frame.downloader",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Frame — YouTube Downloader",
+        "width": 1280,
+        "height": 850,
+        "minWidth": 1024,
+        "minHeight": 700
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; frame-src 'none'; object-src 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "shortDescription": "Video e audio, sul tuo computer.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "../resources/runtime/": "runtime/",
+      "../worker/": "worker/",
+      "../resources/runtime-lock.json": "runtime-lock.json",
+      "../resources/engine-requirements.txt": "engine-requirements.txt",
+      "../resources/THIRD-PARTY-NOTICES.md": "THIRD-PARTY-NOTICES.md",
+      "../resources/canaries.json": "canaries.json"
+    },
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["Italian", "English"]
+      }
+    }
+  }
+}

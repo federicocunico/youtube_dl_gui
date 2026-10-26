@@ -1,0 +1,39 @@
+{
+  "name": "youtube-dl-gui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "build": "npm run check && vite build",
+    "tauri": "tauri",
+    "test": "vitest run",
+    "test:ui": "playwright test",
+    "runtime": "node scripts/provision-runtime.mjs",
+    "verify": "node scripts/verify.mjs",
+    "verify:live": "node scripts/verify-canaries.mjs",
+    "format": "prettier --write src scripts tests/ui && cargo fmt --manifest-path src-tauri/Cargo.toml"
+  },
+  "dependencies": {
+    "@lucide/svelte": "1.61.0",
+    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-dialog": "^2.6.0",
+    "svelte": "^5.53.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tauri-apps/cli": "^2.10.0",
+    "@tsconfig/svelte": "^5.0.5",
+    "prettier": "3.9.10",
+    "prettier-plugin-svelte": "4.1.1",
+    "svelte-check": "^4.4.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "5.0.5"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "target": "windows-x64",
+  "python": {
+    "version": "20261021",
+    "name": "cpython-3.13.17+20261021-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+    "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.13.17%2B20261021-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+    "sha256": "56cde3b1a1dcc36576753cb408ee0c3568d211baafa0eee40423adc147c480f2",
+    "source": "https://github.com/astral-sh/python-build-standalone/releases/tag/20261021"
+  },
+  "ffmpeg": {
+    "version": "autobuild-2026-09-30-13-08",
+    "name": "ffmpeg-N-127021-ge0c94b2d1c-win64-lgpl-shared.zip",
+    "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-30-13-08/ffmpeg-N-127021-ge0c94b2d1c-win64-lgpl-shared.zip",
+    "sha256": "2cc3dd0baf74ebd68a3fceaf771df8351a7a6d69694d05f43b16bb0c966ec909",
+    "source": "https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2026-09-30-13-08"
+  },
+  "deno": {
+    "version": "v2.9.8",
+    "name": "deno-x86_64-pc-windows-msvc.zip",
+    "url": "https://github.com/denoland/deno/releases/download/v2.9.8/deno-x86_64-pc-windows-msvc.zip",
+    "sha256": "cba84b26e0df5ae7f74fc66b86a95b866872a86292ebd84fa1e959927edd93bf",
+    "source": "https://github.com/denoland/deno/releases/tag/v2.9.8"
+  },
+  "engine": "2026.10.21",
+  "licenses": [
+    {
+      "name": "deno-LICENSE.md",
+      "url": "https://raw.githubusercontent.com/denoland/deno/v2.9.8/LICENSE.md",
+      "sha256": "f62497fffecc0852960c8d3e6934b9db86d16396e9b604072e923892cae3a588"
+    }
+  ],
+  "packages": [
+    {
+      "name": "yt-dlp",
+      "version": "2026.10.21",
+      "sha256": "94a3a3e2c423129d0bbd2f1be000c4171fa1226c29e251c84aff868f2851c247"
+    },
+    {
+      "name": "yt-dlp-ejs",
+      "version": "0.8.0",
+      "sha256": "79300e5fca7f937a1eeede11f0456862c1b41107ce1d726871e0207424f4bdb4"
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2",
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0"
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "sha256": "78456a747de8dc58360ffa581f30a002baf5aa28cb262536545e91f113ed7639"
+    },
+    {
+      "name": "idna",
+      "version": "3.20",
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c"
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0",
+      "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3"
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+    },
+    {
+      "name": "certifi",
+      "version": "2026.10.23",
+      "sha256": "e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1"
+    },
+    {
+      "name": "websockets",
+      "version": "17.3",
+      "sha256": "66027e401c70d0cf55021b91b8a7ec2cd5810e20602f945b4fe6ae8b37ed232b"
+    },
+    {
+      "name": "brotli",
+      "version": "1.2.1",
+      "sha256": "e6c4fa55eab6b5684b33239597876a18a35ce1280b63ab960164032afbb8783f"
+    },
+    {
+      "name": "mutagen",
+      "version": "1.48.1",
+      "sha256": "4f077fe87d3fc7fba259aa63d8c026b18382ca6a42ef37c61e16f1b1b5b82fe7"
+    },
+    {
+      "name": "pycryptodomex",
+      "version": "3.24.1",
+      "sha256": "82eb0dd8a95be97f03527b108ee49f9b86a7c534fa47fa7a510be3eab8ea9acd"
+    }
+  ]
+}
