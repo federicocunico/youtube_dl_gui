@@ -52,9 +52,17 @@ try {
   const uninstall = readdirSync(root).find((name) =>
     /^uninstall.*\.exe$/i.test(name),
   );
-  if (uninstall)
-    spawnSync(join(root, uninstall), ['/S'], {
-      windowsHide: true,
-      timeout: 120000,
-    });
+  if (!uninstall) throw new Error('Installed NSIS uninstaller is missing.');
+  const removal = spawnSync(join(root, uninstall), ['/S'], {
+    windowsHide: true,
+    timeout: 120000,
+  });
+  if (removal.error || removal.status !== 0)
+    throw new Error('Silent uninstall failed.');
+  const deadline = Date.now() + 20000;
+  while (existsSync(join(root, 'Frame.exe')) && Date.now() < deadline)
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  if (existsSync(join(root, 'Frame.exe')))
+    throw new Error('Uninstall did not remove the installed executable.');
+  console.log('Silent uninstall verified.');
 }

@@ -13,12 +13,37 @@ const listener = createServer();
 await new Promise((r) => listener.listen(0, '127.0.0.1', r));
 const port = listener.address().port;
 await new Promise((r) => listener.close(r));
+// Elevated WebView2 hosts ignore environment/HKCU browser flags. GitHub's
+// Windows runner is elevated; scope the documented HKLM override to Frame.exe.
+// https://learn.microsoft.com/microsoft-edge/webview2/concepts/security
+const registry = join(process.env.SystemRoot, 'System32/reg.exe');
+const policy =
+  'HKLM\\Software\\Policies\\Microsoft\\Edge\\WebView2\\AdditionalBrowserArguments';
+const configured = spawnSync(
+  registry,
+  [
+    'add',
+    policy,
+    '/v',
+    'Frame.exe',
+    '/t',
+    'REG_SZ',
+    '/d',
+    `--remote-debugging-port=${port} --disable-gpu`,
+    '/f',
+  ],
+  { encoding: 'utf8', windowsHide: true },
+);
+if (configured.error || configured.status !== 0)
+  throw new Error(
+    `Cannot configure isolated CI WebView2 debugging: ${configured.stderr}`,
+  );
 const child = spawn(join(root, 'Frame.exe'), [], {
   windowsHide: true,
   env: {
     ...process.env,
     PATH: '',
-    WEBVIEW2_USER_DATA_FOLDER: join(reports, 'webview-profile'),
+    WEBVIEW2_USER_DATA_FOLDER: resolve('.runtime-cache/native-webview-profile'),
     WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${port} --disable-gpu`,
   },
   stdio: ['ignore', 'pipe', 'pipe'],
@@ -177,4 +202,11 @@ try {
 } finally {
   await browser?.close().catch(() => {});
   if (child.exitCode === null) child.kill();
+  const removed = spawnSync(
+    registry,
+    ['delete', policy, '/v', 'Frame.exe', '/f'],
+    { encoding: 'utf8', windowsHide: true },
+  );
+  if (removed.error || removed.status !== 0)
+    throw new Error('Cannot remove isolated CI WebView2 debugging policy.');
 }

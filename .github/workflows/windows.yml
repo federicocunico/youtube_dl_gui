@@ -32,7 +32,10 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             src-tauri/target
-          key: windows-rust-${{ hashFiles('src-tauri/Cargo.lock', 'rust-toolchain.toml') }}
+          key: windows-rust-${{ hashFiles('src-tauri/Cargo.lock', 'rust-toolchain.toml') }}-${{ github.sha }}
+          restore-keys: |
+            windows-rust-${{ hashFiles('src-tauri/Cargo.lock', 'rust-toolchain.toml') }}-
+            windows-rust-${{ hashFiles('src-tauri/Cargo.lock', 'rust-toolchain.toml') }}
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: runtime-cache
         with:
@@ -92,7 +95,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             src-tauri/target
-          key: windows-rust-${{ hashFiles('src-tauri/Cargo.lock', 'rust-toolchain.toml') }}
+          key: windows-rust-${{ hashFiles('src-tauri/Cargo.lock', 'rust-toolchain.toml') }}-${{ github.sha }}
       - name: Save verified runtime downloads
         if: always() && steps.runtime-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
