@@ -145,6 +145,7 @@ try {
     throw new Error('Remote preview can invoke native commands.');
   await remote.close();
   const session = await page.context().newCDPSession(page);
+  const scales = [];
   for (const scale of [1, 1.5, 2]) {
     await session.send('Emulation.setDeviceMetricsOverride', {
       width: 1024,
@@ -152,6 +153,18 @@ try {
       deviceScaleFactor: scale,
       mobile: false,
     });
+    await page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        ),
+    );
+    const pixelRatio = await page.evaluate(() => window.devicePixelRatio);
+    if (Math.abs(pixelRatio - scale) > 0.01)
+      throw new Error(
+        `Native rendering scale did not apply: expected ${scale}, got ${pixelRatio}`,
+      );
+    scales.push({ requested: scale, devicePixelRatio: pixelRatio });
     const button = page.getByRole('button', { name: 'Aggiungi alla coda' });
     await button.waitFor();
     const box = await button.boundingBox();
@@ -162,6 +175,10 @@ try {
       fullPage: true,
     });
   }
+  writeFileSync(
+    join(reports, 'rendering-scales.json'),
+    JSON.stringify(scales, null, 2),
+  );
   await page.getByRole('button', { name: 'Impostazioni', exact: true }).click();
   const folder = join(reports, 'downloads');
   mkdirSync(folder, { recursive: true });

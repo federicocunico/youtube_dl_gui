@@ -23,7 +23,7 @@
 - [x] 3.2 Implementare inspect yt-dlp con metadati e formati normalizzati, senza download completo; verificare fixture valide, thumbnail assente, video privato/rimosso/login e live attivo.
 - [x] 3.3 Implementare enumerazione incrementale e cancellabile delle playlist con selezione e dettaglio lazy; verificare risultati parziali, elementi inaccessibili e cancellazione su playlist estesa.
 - [x] 3.4 Collegare la UI Aggiungi con input multilinea, risultati selezionabili e preview titolo/canale/thumbnail/durata; verificare il percorso bulk misto fino all'enqueue con test di interazione.
-- [ ] 3.5 Implementare playback su richiesta in webview senza privilegi e fallback browser; verificare embed negato, mancato autoplay e rifiuto di accesso IPC/file da contenuto remoto.
+- [x] 3.5 Implementare playback su richiesta in webview senza privilegi e fallback browser; verificare embed negato, mancato autoplay e rifiuto di accesso IPC/file da contenuto remoto.
 - [x] 3.6 Documentare URL supportati, limiti discovery e fallback preview nella guida utente; verificare corrispondenza dei casi documentati con fixture e messaggi UI.
 
 ## 4. Output video/audio e destinazioni
@@ -49,22 +49,22 @@
 
 ## 6. Rifinitura dell'esperienza desktop
 
-- [ ] 6.1 Completare navigazione Aggiungi/Coda/Impostazioni, token visivi, temi e stati vuoti/loading/error; verificare screenshot reali e azioni primarie a finestra 1024x700 e alle scale Windows 100/150/200%.
+- [x] 6.1 Completare navigazione Aggiungi/Coda/Impostazioni, token visivi, temi e stati vuoti/loading/error; verificare screenshot reali e azioni primarie a finestra 1024x700 e alle scale Windows 100/150/200%.
 - [x] 6.2 Completare focus, etichette accessibili, scorciatoie e comunicazione degli stati indipendente dal colore; verificare l'intero flusso solo audio usando esclusivamente tastiera.
 - [x] 6.3 Limitare frequenza eventi di progresso e costo delle liste; verificare fixture di 100 job con tre transfer simulati e ack pausa/cancel entro 500 ms, documentando macchina e misurazione.
 - [x] 6.4 Implementare chiusura con scelta resta aperto/annulla e chiudi e pulizia diagnostica; verificare stop dei figli, recupero paused al riavvio e assenza di URL firmati o dati sensibili nei log.
 
 ## 7. Installer e GitHub Actions
 
-- [ ] 7.1 Configurare NSIS per-user Windows x64 con risorse baseline e WebView2 bootstrapper; verificare installazione, avvio e disinstallazione su Windows senza toolchain con percorsi spazi/Unicode.
+- [x] 7.1 Configurare NSIS per-user Windows x64 con risorse baseline e WebView2 bootstrapper; verificare installazione, avvio e disinstallazione su Windows senza toolchain con percorsi spazi/Unicode.
 - [x] 7.2 Creare harness del pacchetto installato con fixture HTTP locali e controllo origine dei runtime; verificare private pip, protocollo, download/mux/audio e integrazione rollback, facendo fallire la prova se manca un binario incluso anche quando esiste sul PATH.
-- [ ] 7.3 Creare workflow PR/main/manuale con permessi minimi, installazioni da lockfile e gate locali equivalenti; verificare che PR senza segreti completino test/build e che main produca installer, checksum, inventario e notice.
+- [x] 7.3 Creare workflow PR/main/manuale con permessi minimi, installazioni da lockfile e gate locali equivalenti; verificare che PR senza segreti completino test/build e che main produca installer, checksum, inventario e notice.
 - [x] 7.4 Creare workflow tag v* con controllo versione e canary YouTube obbligatorio, pubblicazione solo dell'artefatto verificato e stato firma dichiarato; verificare che test fallito o inconclusivo impedisca la pubblicazione.
-- [ ] 7.5 Documentare download degli artefatti CI e delle release, installazione, requisito eventuale WebView2, provenienza/licenze e firma; verificare guida su una macchina Windows pulita.
+- [x] 7.5 Documentare download degli artefatti CI e delle release, installazione, requisito eventuale WebView2, provenienza/licenze e firma; verificare guida su una macchina Windows pulita.
 
 ## 8. Accettazione integrata
 
-- [ ] 8.1 Eseguire scenari integrati video muxato, audio-only, bulk/playlist, errore per elemento, cancel/restart e impostazioni persistenti sul pacchetto installato; conservare risultati e inventario della build verificata.
+- [x] 8.1 Eseguire scenari integrati video muxato, audio-only, bulk/playlist, errore per elemento, cancel/restart e impostazioni persistenti sul pacchetto installato; conservare risultati e inventario della build verificata.
 - [x] 8.2 Eseguire aggiornamento motore con download reale, regressione indotta e rollback automatico mentre esistono job attivi; verificare nuove assegnazioni, job preservati, retry unico e assenza di loop dopo riavvio.
-- [ ] 8.3 Eseguire tutti i gate locali equivalenti alla CI e validazione OpenSpec strict; verificare esito positivo e registrare eventuali limiti esterni prima della consegna.
-- [ ] 8.4 Se durante la consegna viene eseguito un push che attiva workflow, identificarne il run per commit, monitorarlo fino a termine, riprodurre/correggere eventuali errori e monitorare il nuovo push; riportare esito finale o blocker esplicito. In assenza di push, registrare non applicabile senza crearne uno solo per questa attività.
+- [x] 8.3 Eseguire tutti i gate locali equivalenti alla CI e validazione OpenSpec strict; verificare esito positivo e registrare eventuali limiti esterni prima della consegna.
+- [x] 8.4 Se durante la consegna viene eseguito un push che attiva workflow, identificarne il run per commit, monitorarlo fino a termine, riprodurre/correggere eventuali errori e monitorare il nuovo push; riportare esito finale o blocker esplicito. In assenza di push, registrare non applicabile senza crearne uno solo per questa attività.

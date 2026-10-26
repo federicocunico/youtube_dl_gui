@@ -4,6 +4,12 @@ Local verification: 2026-10-26, Windows 11 Pro 10.0.26200, Intel Core i9-12900F.
 Tool versions and bundled binary hashes are recorded in `runtime-lock.json`
 and the generated runtime inventory. Repeatable commands are in DEVELOPMENT.md.
 
+`make all` passed the complete setup, 62 deterministic tests, production build,
+installed-package checks and artifact collection. `make package` with zlib
+compression completed in 100.4 seconds on this machine and produced a 151.76 MiB
+installer. `make smoke` subsequently verified installation, the private runtime
+and removal of the installed executable by the silent uninstaller.
+
 The browser UI suite exercises bulk discovery and duplicate selection, a
 keyboard-only audio workflow, missing output files, update errors, close
 confirmation and primary-action visibility at 1024×700 with pixel scales
@@ -49,5 +55,15 @@ absent test evidence.
 Local native UI automation was denied by the computer-use approval layer.
 The CI-only desktop harness runs on the isolated Windows runner and checks
 the installed production WebView2, settings persistence and remote-preview
-IPC isolation. Its screenshots and final workflow result are the evidence for
-native UI acceptance; no local native startup is claimed by the browser tests.
+IPC/file isolation. These checks passed on Windows Server 2025 in
+[run 40338985006](https://github.com/federicocunico/youtube_dl_gui/actions/runs/40338985006),
+commit `bfe5b1ad33fd5a8cc1fc9d6785792544bef5773d`. The run produced the verified
+installer, checksums, inventory and notices. Native screenshots cover three
+rendering scales plus dark/light settings and queue navigation.
+
+The runner uses an elevated process. WebView2 ignores environment browser flags
+in that case, so the CI harness applies Microsoft's documented HKLM override
+only for `Frame.exe`, then removes it in `finally`. This configuration belongs
+to the isolated test runner. Its screenshots and workflow result are the
+evidence for native UI acceptance; no local native startup is claimed by the
+browser tests.
