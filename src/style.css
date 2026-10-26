@@ -166,9 +166,9 @@ svg {
   color: var(--accent);
 }
 .brand > span {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 650;
-  letter-spacing: -1.4px;
+  letter-spacing: -1px;
 }
 .brand-dot {
   color: var(--accent);

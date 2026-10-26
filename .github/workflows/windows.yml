@@ -1,4 +1,4 @@
-name: Windows build
+name: YT Saver Windows build and release
 on:
   pull_request:
   push:
@@ -14,7 +14,22 @@ concurrency:
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.plan.outputs.tag }}
+      publish: ${{ steps.plan.outputs.publish }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: .node-version
+      - name: Validate versions and plan automatic tag
+        id: plan
+        run: node scripts/release-version.mjs
+
   build:
+    needs: version
     runs-on: windows-2025
     timeout-minutes: 60
     steps:
@@ -63,9 +78,10 @@ jobs:
       - name: Installed production package and native UI
         shell: pwsh
         env:
-          FRAME_VERIFY_LIVE: ${{ startsWith(github.ref, 'refs/tags/') }}
+          FRAME_VERIFY_LIVE: ${{ needs.version.outputs.publish }}
         run: |
-          $installer = Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $installer = Get-ChildItem "src-tauri/target/release/bundle/nsis/YT Saver_$($version)_x64-setup.exe"
           if ($installer.Count -ne 1) { throw 'Expected one installer' }
           node scripts/smoke-install.mjs $installer.FullName
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -74,7 +90,7 @@ jobs:
       - name: Downloadable Windows installer
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: Frame-windows-x64
+          name: YT-Saver-windows-x64
           path: artifacts/*
           if-no-files-found: error
           retention-days: 30
@@ -108,19 +124,29 @@ jobs:
           key: windows-runtime-${{ hashFiles('resources/runtime-lock.json', 'resources/engine-requirements.txt') }}
 
   release:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: build
+    if: needs.version.outputs.publish == 'true'
+    needs: [version, build]
     runs-on: ubuntu-latest
+    concurrency:
+      group: yt-saver-release-${{ needs.version.outputs.tag }}
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: .node-version
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: Frame-windows-x64
+          name: YT-Saver-windows-x64
           path: artifacts
       - name: Publish the verified installer
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          FRAME_TAG: ${{ github.ref_name }}
-        run: gh release create "$FRAME_TAG" artifacts/* --verify-tag --title "Frame $FRAME_TAG" --notes "Windows x64 installer. Includes private download engine and media tools. Unsigned build; SHA-256 checksums and third-party notices are attached."
+          RELEASE_TAG: ${{ needs.version.outputs.tag }}
+        run: node scripts/publish-release.mjs

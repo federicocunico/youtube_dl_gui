@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { version as appVersion } from '../package.json';
   import { onMount } from 'svelte';
   import { invoke, isTauri } from '@tauri-apps/api/core';
   import { listen } from '@tauri-apps/api/event';
@@ -183,7 +184,7 @@
         await register('close-request', async () => {
           if (
             await confirm(
-              'I download verranno interrotti e potranno essere ripresi al prossimo avvio. Chiudere Frame?',
+              'I download verranno interrotti e potranno essere ripresi al prossimo avvio. Chiudere YT Saver?',
               {
                 title: 'Download in corso',
                 kind: 'warning',
@@ -207,7 +208,7 @@
   async function analyze() {
     if (!input.trim() || busy) return;
     if (!native) {
-      error('Avvia l’app desktop Frame per analizzare e scaricare i video.');
+      error('Avvia l’app desktop YT Saver per analizzare e scaricare i video.');
       return;
     }
     message = '';
@@ -419,9 +420,9 @@
       href="#add"
       class="brand"
       onclick={() => (view = 'add')}
-      aria-label="Frame, nuovo download"
+      aria-label="YT Saver, nuovo download"
       ><Frame size={29} strokeWidth={1.8} /><span
-        >frame<span class="brand-dot">.</span></span
+        >YT Saver<span class="brand-dot">.</span></span
       ></a
     >
     <div class="nav-caption">IL TUO SPAZIO</div>
@@ -457,7 +458,7 @@
     <div class="sidebar-bottom">
       <div>
         <span class="status-dot"></span>Motore locale<span class="version"
-          >v0.1.0</span
+          >v{appVersion}</span
         >
       </div>
       <button
@@ -497,7 +498,7 @@
     <main>
       {#if !native}<div class="notice">
           Anteprima dell’interfaccia. Per scaricare i media, avvia l’app desktop
-          Frame.
+          YT Saver.
         </div>{/if}
       {#if message}<div class="alert" role="alert">
           <span>{message}</span><button
@@ -817,7 +818,7 @@
               <p>
                 {snapshot.jobs.length
                   ? 'Prova un’altra ricerca o un altro filtro.'
-                  : 'Aggiungi un video, scegli la qualità e al resto pensa Frame.'}
+                  : 'Aggiungi un video, scegli la qualità e al resto pensa YT Saver.'}
               </p>
               {#if !snapshot.jobs.length}<button
                   class="button primary"
@@ -1084,7 +1085,7 @@
         </div>
       {/if}
       <footer class="page-footer">
-        <span>FRAME · VIDEO E AUDIO, SUL TUO COMPUTER.</span><span
+        <span>YT SAVER · VIDEO E AUDIO, SUL TUO COMPUTER.</span><span
           ><ShieldCheck size={13} />Elaborazione locale</span
         >
       </footer>

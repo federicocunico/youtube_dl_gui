@@ -39,7 +39,7 @@ For all deterministic gates and the Windows installer:
 npx playwright install chromium
 npm run verify
 npm run tauri -- build --ci --bundles nsis
-node scripts/smoke-install.mjs src-tauri/target/release/bundle/nsis/Frame_0.1.0_x64-setup.exe
+node scripts/smoke-install.mjs "src-tauri/target/release/bundle/nsis/YT Saver_0.1.0_x64-setup.exe"
 npm run verify:live
 ```
 
@@ -52,6 +52,25 @@ The Windows workflow runs deterministic gates, builds and installs NSIS, checks
 the production worker and native UI, and uploads verified artifacts. Tag builds
 also enforce matching app versions and successful live download/rollback gates
 before a separate least-privilege release job publishes the installer.
+
+## Automatic tags and releases
+
+Set the same new SemVer in `package.json`, both root entries in
+`package-lock.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`.
+Regenerate and commit the Cargo lockfile after a version change with
+`cargo check --manifest-path src-tauri/Cargo.toml`.
+Push to `main` (or manually dispatch the workflow on `main`). The workflow
+detects that `v<version>` does not exist, runs the real YouTube and rollback
+gates against the installed package, then pushes an annotated tag and creates
+a GitHub release with the verified installer, checksums, inventory and notices.
+The release remains a draft until all expected assets are uploaded.
+
+No additional token secret is required. Tag creation and release publication
+share the same verified workflow because tags pushed with `GITHUB_TOKEN` do
+not trigger another run. Existing version tags are never moved; ordinary
+commits with an already tagged version produce CI artifacts only. Pushing a
+matching `v*` tag directly also runs all release gates. Re-running a failed
+publication can resume its draft; an existing published release is preserved.
 
 To work on the desktop UI:
 

@@ -168,6 +168,10 @@ test('bulk input, duplicates and selected items reach native enqueue', async ({
 }) => {
   await mock(page);
   await page.goto('/');
+  await expect(page).toHaveTitle(/YT Saver/);
+  await expect(
+    page.getByRole('link', { name: 'YT Saver, nuovo download' }),
+  ).toBeVisible();
   await page
     .getByRole('textbox', { name: 'URL YouTube, uno per riga' })
     .fill('https://youtu.be/BaW_jenozKc\ninvalid');
@@ -279,12 +283,12 @@ test('missing files and update errors remain actionable', async ({ page }) => {
     state.update = {
       phase: 'error',
       installed_version: '2026.10.21',
-      message: 'Serve aggiornare Frame per il nuovo runtime Python.',
+      message: 'Serve aggiornare YT Saver per il nuovo runtime Python.',
     };
     w.__send('snapshot', state);
   });
   await expect(
-    page.getByText('Serve aggiornare Frame per il nuovo runtime Python.'),
+    page.getByText('Serve aggiornare YT Saver per il nuovo runtime Python.'),
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Controlla e riprova ora' }),

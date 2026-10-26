@@ -36,7 +36,8 @@ function Build-Installer {
     Invoke-Checked 'npm.cmd' @('run','tauri','--','build','--ci','--bundles','nsis')
 }
 function Test-Installed {
-    $installers = @(Get-ChildItem -LiteralPath src-tauri/target/release/bundle/nsis -Filter '*-setup.exe')
+    $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+    $installers = @(Get-ChildItem -LiteralPath src-tauri/target/release/bundle/nsis -Filter "YT Saver_$($version)_x64-setup.exe")
     if ($installers.Count -ne 1) { throw 'Run make build first: expected exactly one NSIS installer.' }
     Invoke-Checked 'node.exe' @('scripts/smoke-install.mjs',$installers[0].FullName)
 }
@@ -57,5 +58,5 @@ try {
             Invoke-Checked 'node.exe' @('scripts/collect-artifacts.mjs')
         }
     }
-    Write-Host "Frame: $Task completed successfully."
+    Write-Host "YT Saver: $Task completed successfully."
 } catch { Write-Error $_; exit 1 }

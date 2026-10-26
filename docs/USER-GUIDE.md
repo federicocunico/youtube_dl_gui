@@ -1,4 +1,4 @@
-# Usare Frame
+# Usare YT Saver
 
 In **Nuovo download**, incolla uno o più link YouTube, uno per riga, e premi
 **Analizza link** (oppure Ctrl+Invio). Sono supportati video watch, link youtu.be,
@@ -37,7 +37,7 @@ voce della selezione. Le impostazioni globali si salvano in **Impostazioni**;
 non modificano i job già inseriti.
 
 Puoi modificare il nome del file; il nome finale viene reso valido per Windows.
-Un file già esistente non viene sovrascritto: Frame aggiunge un suffisso come
+Un file già esistente non viene sovrascritto: YT Saver aggiunge un suffisso come
 `(1)`. Il suggerimento è una previsione: eventuali collisioni sorte nel frattempo
 vengono risolte anche alla pubblicazione. Spazio o dimensioni possono essere
 ignoti fino al trasferimento; il completamento segue la verifica delle tracce.
@@ -67,7 +67,7 @@ chiusura durante il lavoro chiede se restare aperti o interrompere e chiudere.
 
 ## Aggiornamenti del motore
 
-Frame controlla le nuove versioni stabili di yt-dlp all'avvio, al massimo una
+YT Saver controlla le nuove versioni stabili di yt-dlp all'avvio, al massimo una
 volta ogni 24 ore, e con **Controlla e riprova ora**. Ogni versione stabile è
 ammessa al test, indipendentemente da major/minor o anno. L'installazione pip
 avviene in un ambiente privato, senza modificare Python di sistema o i job già
@@ -83,6 +83,6 @@ causano rollback automatico e un solo tentativo di recupero per i job interessat
 
 Offline, errori della sorgente o problemi al disco non vengono interpretati da
 soli come regressioni. Se una nuova versione richiede Python o runtime nativi
-diversi, Frame conserva quella precedente e indica che serve aggiornare l'app.
+diversi, YT Saver conserva quella precedente e indica che serve aggiornare l'app.
 Il pannello mostra versione, test e cronologia dei ripristini. La coda e le
 preferenze restano sul computer; i collegamenti a YouTube e PyPI richiedono rete.

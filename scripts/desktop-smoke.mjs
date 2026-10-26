@@ -14,7 +14,7 @@ await new Promise((r) => listener.listen(0, '127.0.0.1', r));
 const port = listener.address().port;
 await new Promise((r) => listener.close(r));
 // Elevated WebView2 hosts ignore environment/HKCU browser flags. GitHub's
-// Windows runner is elevated; scope the documented HKLM override to Frame.exe.
+// Windows runner is elevated; scope the documented HKLM override to YT-Saver.exe.
 // https://learn.microsoft.com/microsoft-edge/webview2/concepts/security
 const registry = join(process.env.SystemRoot, 'System32/reg.exe');
 const policy =
@@ -25,7 +25,7 @@ const configured = spawnSync(
     'add',
     policy,
     '/v',
-    'Frame.exe',
+    'YT-Saver.exe',
     '/t',
     'REG_SZ',
     '/d',
@@ -38,7 +38,7 @@ if (configured.error || configured.status !== 0)
   throw new Error(
     `Cannot configure isolated CI WebView2 debugging: ${configured.stderr}`,
   );
-const child = spawn(join(root, 'Frame.exe'), [], {
+const child = spawn(join(root, 'YT-Saver.exe'), [], {
   windowsHide: true,
   env: {
     ...process.env,
@@ -83,7 +83,7 @@ try {
         '-NoProfile',
         '-NonInteractive',
         '-Command',
-        `Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^(Frame|msedgewebview2)' } | Select-Object Name,ProcessId,CommandLine | ConvertTo-Json -Depth 3; Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $bounds=[Windows.Forms.Screen]::PrimaryScreen.Bounds; $bitmap=[Drawing.Bitmap]::new($bounds.Width,$bounds.Height); $graphics=[Drawing.Graphics]::FromImage($bitmap); $graphics.CopyFromScreen($bounds.Location,[Drawing.Point]::Empty,$bounds.Size); $bitmap.Save('test-results/native/startup-desktop.png'); $graphics.Dispose(); $bitmap.Dispose()`,
+        `Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^(YT-Saver|msedgewebview2)' } | Select-Object Name,ProcessId,CommandLine | ConvertTo-Json -Depth 3; Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $bounds=[Windows.Forms.Screen]::PrimaryScreen.Bounds; $bitmap=[Drawing.Bitmap]::new($bounds.Width,$bounds.Height); $graphics=[Drawing.Graphics]::FromImage($bitmap); $graphics.CopyFromScreen($bounds.Location,[Drawing.Point]::Empty,$bounds.Size); $bitmap.Save('test-results/native/startup-desktop.png'); $graphics.Dispose(); $bitmap.Dispose()`,
       ],
       { encoding: 'utf8', windowsHide: true, timeout: 15000 },
     );
@@ -221,7 +221,7 @@ try {
   if (child.exitCode === null) child.kill();
   const removed = spawnSync(
     registry,
-    ['delete', policy, '/v', 'Frame.exe', '/f'],
+    ['delete', policy, '/v', 'YT-Saver.exe', '/f'],
     { encoding: 'utf8', windowsHide: true },
   );
   if (removed.error || removed.status !== 0)

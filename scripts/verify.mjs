@@ -12,7 +12,11 @@ function run(command, args) {
 }
 run(process.execPath, [npm, 'run', 'check']);
 run(process.execPath, [npm, 'test']);
-run(process.execPath, ['--test', 'tests/release-gate.test.mjs']);
+run(process.execPath, [
+  '--test',
+  'tests/release-gate.test.mjs',
+  'tests/release-automation.test.mjs',
+]);
 run(resolve('resources/runtime/python/python.exe'), [
   '-I',
   '-m',

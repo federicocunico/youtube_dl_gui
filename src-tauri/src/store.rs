@@ -27,7 +27,7 @@ impl Store {
             .open(directory.join("instance.lock"))
             .map_err(db_error)?;
         lock.try_lock_exclusive()
-            .map_err(|_| "Frame è già aperto. Usa la finestra esistente.".to_string())?;
+            .map_err(|_| "YT Saver è già aperto. Usa la finestra esistente.".to_string())?;
         let connection = Connection::open(directory.join("state.sqlite")).map_err(db_error)?;
         connection
             .busy_timeout(std::time::Duration::from_secs(5))
@@ -41,7 +41,7 @@ impl Store {
             .pragma_query_value(None, "user_version", |r| r.get(0))
             .map_err(db_error)?;
         if version > 1 {
-            return Err("Archivio creato da una versione più recente di Frame.".into());
+            return Err("Archivio creato da una versione più recente di YT Saver.".into());
         }
         if version == 0 {
             connection.execute_batch("BEGIN IMMEDIATE;

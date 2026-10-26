@@ -1,4 +1,4 @@
-# Frame
+# YT Saver
 
 Desktop YouTube downloader for Windows 10/11 x64, built with Svelte, Tauri and a
 private Python engine. Download video with audio, extract or convert audio,
@@ -9,6 +9,9 @@ a confirmed regression automatically restores the previous engine.
 Get the precompiled installer from [GitHub Actions](https://github.com/federicocunico/youtube_dl_gui/actions/workflows/windows.yml)
 or versioned [releases](https://github.com/federicocunico/youtube_dl_gui/releases).
 See the [installation guide](docs/INSTALLATION.md) and [user guide](docs/USER-GUIDE.md).
+
+New manifest versions on `main` automatically create an annotated version tag
+and a release after all installed-app and live download checks pass.
 
 For a complete local setup, verification and Windows installer build, run
 `make all`. Run `make help` for individual targets. Without Make, use

@@ -26,7 +26,7 @@ def tls_context():
 
 
 def get_json(url):
-    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Frame-Updater/0.1"}), timeout=25, context=tls_context()) as response:
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "YT-Saver-Updater/0.1"}), timeout=25, context=tls_context()) as response:
         data = response.read(16 * 1024 * 1024 + 1)
     if len(data) > 16 * 1024 * 1024: raise WorkerError("network", "Metadati aggiornamento troppo grandi.")
     return json.loads(data)
@@ -49,7 +49,7 @@ def pip_run(python, arguments, cwd):
     if result.returncode:
         text = result.stdout.decode("utf-8", "replace")
         if "Requires-Python" in text or "requires a different Python" in text or "No matching distribution" in text:
-            raise WorkerError("runtime", "Versione non installabile sul runtime incluso. Può essere necessario aggiornare Frame.")
+            raise WorkerError("runtime", "Versione non installabile sul runtime incluso. Può essere necessario aggiornare YT Saver.")
         raise WorkerError("network", "Installazione pip non riuscita; la versione attiva è stata conservata.")
 
 

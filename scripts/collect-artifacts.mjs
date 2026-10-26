@@ -5,23 +5,28 @@ import {
   mkdirSync,
   readFileSync,
   writeFileSync,
+  unlinkSync,
 } from 'node:fs';
 import { join, resolve } from 'node:path';
 const source = resolve('src-tauri/target/release/bundle/nsis');
 const output = resolve('artifacts');
 mkdirSync(output, { recursive: true });
-const installers = readdirSync(source).filter((name) =>
-  name.endsWith('-setup.exe'),
+for (const name of readdirSync(output))
+  if (/^(?:Frame|YT[- ]Saver)_.*_x64-setup\.exe$/.test(name))
+    unlinkSync(join(output, name));
+const version = JSON.parse(readFileSync('package.json', 'utf8')).version;
+const installers = readdirSync(source).filter(
+  (name) => name === `YT Saver_${version}_x64-setup.exe`,
 );
 if (installers.length !== 1) throw new Error('Expected one Windows installer.');
 const files = [
-  ...installers,
+  `YT-Saver_${version}_x64-setup.exe`,
   'runtime-lock.json',
   'engine-requirements.txt',
   'THIRD-PARTY-NOTICES.md',
   'inventory.json',
 ];
-copyFileSync(join(source, installers[0]), join(output, installers[0]));
+copyFileSync(join(source, installers[0]), join(output, files[0]));
 for (const name of files.slice(1))
   copyFileSync(
     name === 'inventory.json'
@@ -44,4 +49,4 @@ writeFileSync(
     )
     .join('\n') + '\n',
 );
-console.log(join(output, installers[0]));
+console.log(join(output, files[0]));

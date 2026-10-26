@@ -45,7 +45,7 @@ function run(command, args, options = {}) {
 }
 async function json(url) {
   const response = await fetch(url, {
-    headers: { 'User-Agent': 'Frame-runtime-provisioner' },
+    headers: { 'User-Agent': 'YT-Saver-runtime-provisioner' },
     signal: AbortSignal.timeout(60000),
   });
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);

@@ -423,7 +423,7 @@ pub async fn preview(window: Window, id: String) -> Result<(), String> {
             .unwrap(),
         ),
     )
-    .title("Anteprima YouTube — Frame")
+    .title("Anteprima YouTube — YT Saver")
     .inner_size(900., 560.)
     .on_navigation(|url| {
         url.scheme() == "https"

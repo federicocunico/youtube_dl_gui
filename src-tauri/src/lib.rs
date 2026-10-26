@@ -64,7 +64,7 @@ pub fn run() {
             }
         })
         .run(tauri::generate_context!())
-        .expect("Impossibile avviare Frame");
+        .expect("Impossibile avviare YT Saver");
 }
 pub mod commands;
 pub mod files;

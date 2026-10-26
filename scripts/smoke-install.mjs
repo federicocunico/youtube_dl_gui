@@ -4,7 +4,7 @@ import { resolve, join } from 'node:path';
 const installer = resolve(process.argv[2] || '');
 if (!existsSync(installer) || !installer.endsWith('-setup.exe'))
   throw new Error('Pass the compiled NSIS setup executable.');
-const root = resolve('.runtime-cache/Frame smoke è');
+const root = resolve('.runtime-cache/YT Saver smoke è');
 mkdirSync(root, { recursive: true });
 function run(command, args, env = process.env) {
   const result = spawnSync(command, args, {
@@ -60,9 +60,9 @@ try {
   if (removal.error || removal.status !== 0)
     throw new Error('Silent uninstall failed.');
   const deadline = Date.now() + 20000;
-  while (existsSync(join(root, 'Frame.exe')) && Date.now() < deadline)
+  while (existsSync(join(root, 'YT-Saver.exe')) && Date.now() < deadline)
     await new Promise((resolve) => setTimeout(resolve, 250));
-  if (existsSync(join(root, 'Frame.exe')))
+  if (existsSync(join(root, 'YT-Saver.exe')))
     throw new Error('Uninstall did not remove the installed executable.');
   console.log('Silent uninstall verified.');
 }
