@@ -17,6 +17,7 @@ const child = spawn(join(root, 'Frame.exe'), [], {
   windowsHide: true,
   env: {
     ...process.env,
+    PATH: '',
     WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${port} --remote-debugging-address=127.0.0.1`,
   },
   stdio: 'ignore',
@@ -75,7 +76,14 @@ try {
       await window.__TAURI_INTERNALS__.invoke('snapshot', {});
       return 'unexpected-access';
     } catch {
-      return 'denied';
+      try {
+        await window.__TAURI_INTERNALS__.invoke('plugin:fs|read_text_file', {
+          path: 'C:\\Windows\\win.ini',
+        });
+        return 'unexpected-access';
+      } catch {
+        return 'denied';
+      }
     }
   });
   if (privilege === 'unexpected-access')
@@ -116,6 +124,12 @@ try {
     throw new Error('Native settings roundtrip failed.');
   await page.screenshot({
     path: join(reports, 'native-settings.png'),
+    fullPage: true,
+  });
+  await page.getByLabel('Aspetto').selectOption('light');
+  await page.getByRole('button', { name: 'Salva impostazioni' }).click();
+  await page.screenshot({
+    path: join(reports, 'native-light.png'),
     fullPage: true,
   });
   await page.getByRole('button', { name: 'Coda download' }).click();

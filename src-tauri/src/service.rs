@@ -508,7 +508,13 @@ mod tests {
         assert!(output.contains("Integration_ video"));
         // Simulate termination after atomic rename but before the completed DB commit.
         drop(service);
-        let service = Service::new(resources, data, destination.clone(), |_, _| {}).unwrap();
+        let service = Service::new(
+            resources.clone(),
+            data.clone(),
+            destination.clone(),
+            |_, _| {},
+        )
+        .unwrap();
         assert_eq!(service.queue.lock().unwrap().jobs[0].state, "paused");
         service.reconcile().await;
         assert_eq!(service.queue.lock().unwrap().jobs[0].state, "completed");
@@ -525,5 +531,88 @@ mod tests {
             .claim("baseline")
             .unwrap()
             .is_empty());
+
+        // Exercise a mixed bulk against the installed worker: colliding names and
+        // one inaccessible item must not prevent the other files completing.
+        let batch = {
+            let mut queue = service.queue.lock().unwrap();
+            let options = queue.settings.defaults.clone();
+            queue.enqueue(&[
+                json!({"url":url,"title":"Same name","filename":"Same name"}),
+                json!({"url":url,"title":"Same name","filename":"Same name"}),
+                json!({"url":format!("http://127.0.0.1:{}/missing.mpd",port.trim()),"title":"Unavailable item"}),
+            ], options).unwrap();
+            queue.claim("baseline").unwrap()
+        };
+        let mut tasks = Vec::new();
+        for (job, cancel) in batch {
+            let service = service.clone();
+            tasks.push(tokio::spawn(async move {
+                let result = service.download_job(&job, cancel).await;
+                service
+                    .queue
+                    .lock()
+                    .unwrap()
+                    .finish(&job.id, &job.attempt_id, result)
+                    .unwrap();
+            }));
+        }
+        for task in tasks {
+            task.await.unwrap();
+        }
+        {
+            let queue = service.queue.lock().unwrap();
+            assert_eq!(
+                queue.jobs.iter().filter(|j| j.state == "completed").count(),
+                3
+            );
+            assert_eq!(queue.jobs.iter().filter(|j| j.state == "failed").count(), 1);
+            let outputs: std::collections::HashSet<_> = queue
+                .jobs
+                .iter()
+                .filter_map(|j| j.output.as_ref())
+                .collect();
+            assert!(outputs.len() >= 3);
+        }
+        let (audio, cancel) = {
+            let mut queue = service.queue.lock().unwrap();
+            let mut options = queue.settings.defaults.clone();
+            options.audio_only = true;
+            queue
+                .enqueue(&[json!({"url":url,"title":"Audio restart"})], options)
+                .unwrap();
+            let claimed = queue.claim("baseline").unwrap().remove(0);
+            queue.control(&claimed.0.id, "cancel").unwrap();
+            claimed
+        };
+        let cancelled = service.download_job(&audio, cancel).await;
+        assert!(cancelled.is_err());
+        let retry = {
+            let mut queue = service.queue.lock().unwrap();
+            queue
+                .finish(&audio.id, &audio.attempt_id, cancelled)
+                .unwrap();
+            assert_eq!(queue.jobs.last().unwrap().state, "cancelled");
+            queue.control(&audio.id, "retry").unwrap();
+            queue.claim("baseline").unwrap().remove(0)
+        };
+        let output = service.download_job(&retry.0, retry.1).await.unwrap();
+        {
+            let mut queue = service.queue.lock().unwrap();
+            queue
+                .finish(&retry.0.id, &retry.0.attempt_id, Ok(output))
+                .unwrap();
+            let mut settings = queue.settings.clone();
+            settings.concurrent_jobs = 2;
+            queue.settings(settings).unwrap();
+        }
+        drop(service);
+        let service = Service::new(resources, data, destination, |_, _| {}).unwrap();
+        let queue = service.queue.lock().unwrap();
+        assert_eq!(queue.settings.concurrent_jobs, 2);
+        assert_eq!(
+            queue.jobs.iter().filter(|j| j.state == "completed").count(),
+            4
+        );
     }
 }

@@ -853,7 +853,7 @@
                     >{job.options.audio_only
                       ? 'Solo audio'
                       : job.selection?.height
-                        ? `${job.selection.height}p ? ${job.selection.container.toUpperCase()}`
+                        ? `${job.selection.height}p · ${job.selection.container.toUpperCase()}`
                         : job.options.video_quality
                           ? `Fino a ${job.options.video_quality}p`
                           : 'Migliore qualità'}</span

@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { assertLiveReports } from './release-gate.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 mkdirSync(join(root, 'test-results'), { recursive: true });
@@ -46,9 +47,5 @@ const rollback = JSON.parse(
     'utf8',
   ),
 );
-if (
-  !report.every((item) => item.status === 'pass') ||
-  rollback.status !== 'pass'
-)
-  throw new Error('Incomplete canary report');
+assertLiveReports(report, rollback);
 console.log('All live YouTube canaries passed.');

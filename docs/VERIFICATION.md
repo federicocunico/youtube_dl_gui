@@ -36,6 +36,16 @@ Updater tests cover stable-version selection, hash failure, incompatible
 Python requirements, differential verdicts, quarantine, retry schedule,
 promotion, persistence and environment retention.
 
+The NSIS installer was installed and uninstalled locally in a path with spaces
+and Unicode. Its own worker passed video, audio and MP3 output with an empty
+PATH, binary-origin/hash checks and deliberate removal of its FFmpeg. Rust
+integration tests ran against those installed resources, including a mixed
+bulk with concurrent filename collisions and an inaccessible source, audio
+cancel/retry, durable settings and crash-after-rename recovery. The live
+download and induced rollback suite also passed against the installed runtime.
+The release-gate tests explicitly reject failed, inconclusive, duplicate or
+absent test evidence.
+
 Local native UI automation was denied by the computer-use approval layer.
 The CI-only desktop harness runs on the isolated Windows runner and checks
 the installed production WebView2, settings persistence and remote-preview

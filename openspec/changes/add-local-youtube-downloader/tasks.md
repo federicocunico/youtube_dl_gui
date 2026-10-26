@@ -57,9 +57,9 @@
 ## 7. Installer e GitHub Actions
 
 - [ ] 7.1 Configurare NSIS per-user Windows x64 con risorse baseline e WebView2 bootstrapper; verificare installazione, avvio e disinstallazione su Windows senza toolchain con percorsi spazi/Unicode.
-- [ ] 7.2 Creare harness del pacchetto installato con fixture HTTP locali e controllo origine dei runtime; verificare private pip, protocollo, download/mux/audio e integrazione rollback, facendo fallire la prova se manca un binario incluso anche quando esiste sul PATH.
+- [x] 7.2 Creare harness del pacchetto installato con fixture HTTP locali e controllo origine dei runtime; verificare private pip, protocollo, download/mux/audio e integrazione rollback, facendo fallire la prova se manca un binario incluso anche quando esiste sul PATH.
 - [ ] 7.3 Creare workflow PR/main/manuale con permessi minimi, installazioni da lockfile e gate locali equivalenti; verificare che PR senza segreti completino test/build e che main produca installer, checksum, inventario e notice.
-- [ ] 7.4 Creare workflow tag v* con controllo versione e canary YouTube obbligatorio, pubblicazione solo dell'artefatto verificato e stato firma dichiarato; verificare che test fallito o inconclusivo impedisca la pubblicazione.
+- [x] 7.4 Creare workflow tag v* con controllo versione e canary YouTube obbligatorio, pubblicazione solo dell'artefatto verificato e stato firma dichiarato; verificare che test fallito o inconclusivo impedisca la pubblicazione.
 - [ ] 7.5 Documentare download degli artefatti CI e delle release, installazione, requisito eventuale WebView2, provenienza/licenze e firma; verificare guida su una macchina Windows pulita.
 
 ## 8. Accettazione integrata
